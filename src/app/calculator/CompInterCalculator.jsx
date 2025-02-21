@@ -202,5 +202,3 @@ const CompInterCalculator = () => {
 
 export default CompInterCalculator;
 
-
-//  Just only add variance range input field in the form and calculate the future value with interest for the range of interest rates.
