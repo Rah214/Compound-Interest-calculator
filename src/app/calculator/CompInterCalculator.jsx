@@ -7,7 +7,6 @@ const CompInterCalculator = () => {
   const [years, setYears] = useState("");
   const [estimatedInterestRate, setEstimatedInterestRate] = useState("");
   const [varianceRange, setVarianceRange] = useState("");
-
   const [compoundFrequency, setCompoundFrequency] = useState("Annually");
   const [result, setResult] = useState(null);
 
@@ -16,28 +15,38 @@ const CompInterCalculator = () => {
     const month = parseFloat(monthlyContribution);
     const interest = parseFloat(estimatedInterestRate) / 100;
     const time = parseFloat(years);
+    const variance = parseFloat(varianceRange) / 100;
 
-    if (isNaN(principal) || isNaN(month) || isNaN(interest) || isNaN(time)) {
+    if (isNaN(principal) || isNaN(month) || isNaN(interest) || isNaN(time) || isNaN(variance)) {
       alert("Please fill out all required fields correctly.");
       return;
     }
 
-    const n = 1;
-    let futureValueWithInterest =
-      principal * Math.pow(1 + interest / n, n * time);
+    const n = 1; // Compounding frequency (Annually)
+    const maxInterest = interest + variance;
 
-    for (let i = 1; i <= time * 12; i++) {
-      // Monthly contribution compounded based on remaining periods
-      futureValueWithInterest +=
-        month * Math.pow(1 + interest / n, n * time - i / 12);
-    }
+    const calculateFutureValue = (rate) => {
+      let futureValueWithInterest = principal * Math.pow(1 + rate / n, n * time);
 
-    const futureValueWithoutInterest = principal + month * 12 * time;
+      for (let i = 1; i <= time * 12; i++) {
+        futureValueWithInterest += month * Math.pow(1 + rate / n, n * time - i / 12);
+      }
+
+      const futureValueWithoutInterest = principal + month * 12 * time;
+
+      return {
+        futureValueWithInterest: `₹${futureValueWithInterest.toFixed(2)}`,
+        futureValueWithoutInterest: `₹${futureValueWithoutInterest.toFixed(2)}`,
+        interestRate: `${(rate * 100).toFixed(2)}%`,
+      };
+    };
+
+    const baseResult = calculateFutureValue(interest);
+    const maxResult = calculateFutureValue(maxInterest);
 
     setResult({
-      futureValueWithInterest: `₹${futureValueWithInterest.toFixed(2)}`,
-      futureValueWithoutInterest: `₹${futureValueWithoutInterest.toFixed(2)}`,
-      interestRate: `${estimatedInterestRate}%`,
+      baseResult,
+      maxResult,
     });
   };
 
@@ -80,11 +89,10 @@ const CompInterCalculator = () => {
 
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Step 2: Monthly Contribute
+              Step 2: Monthly Contribution
             </h2>
             <label className="text-sm font-medium text-gray-600">
-            Amount that you plan to add to the principal every month.
-              
+              Amount that you plan to add to the principal every month.
             </label>
             <input
               type="number"
@@ -100,7 +108,7 @@ const CompInterCalculator = () => {
               Step 3: Duration
             </h2>
             <label className="text-sm font-medium text-gray-600">
-              Lenght of time , in years, that you plan to save.
+              Length of time, in years, that you plan to save.
             </label>
             <input
               type="number"
@@ -128,11 +136,11 @@ const CompInterCalculator = () => {
           </div>
 
           <div className="flex flex-col">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Step 5: Interest rate variance range
+            <h2 className="text-xl font-semibold text-gray-700 mb-2">
+              Step 5: Interest Rate Variance Range
             </h2>
             <label className="text-sm font-medium text-gray-600">
-             Range of interest rates that you desire to see result for.
+              Range of interest rates that you desire to see results for.
             </label>
             <input
               type="number"
@@ -141,7 +149,6 @@ const CompInterCalculator = () => {
               className="mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="7%"
             />
-             
           </div>
 
           <div className="flex flex-col">
@@ -184,15 +191,28 @@ const CompInterCalculator = () => {
             <p className="text-xl text-gray-700 mt-2">
               In {years} years, your investment will be:
             </p>
-            <p className="text-3xl text-green-600 font-semibold mt-4">
-              With Interest: {result.futureValueWithInterest}
-            </p>
-            <p className="text-3xl text-gray-600 font-semibold mt-4">
-              Without Interest: {result.futureValueWithoutInterest}
-            </p>
-            <p className="text-lg text-gray-800 mt-4">
-              Estimated Interest Rate: {result.interestRate}
-            </p>
+            <div className="mt-4">
+              <h3 className="text-xl font-semibold text-gray-700">
+                Interest Rate: {result.baseResult.interestRate}
+              </h3>
+              <p className="text-3xl text-green-600 font-semibold mt-2">
+                With Interest: {result.baseResult.futureValueWithInterest}
+              </p>
+              <p className="text-3xl text-gray-600 font-semibold mt-2">
+                Without Interest: {result.baseResult.futureValueWithoutInterest}
+              </p>
+            </div>
+            <div className="mt-6">
+              <h3 className="text-xl font-semibold text-gray-700">
+                Maximum Interest Rate: {result.maxResult.interestRate}
+              </h3>
+              <p className="text-3xl text-green-600 font-semibold mt-2">
+                With Interest: {result.maxResult.futureValueWithInterest}
+              </p>
+              <p className="text-3xl text-gray-600 font-semibold mt-2">
+                Without Interest: {result.maxResult.futureValueWithoutInterest}
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -201,4 +221,3 @@ const CompInterCalculator = () => {
 };
 
 export default CompInterCalculator;
-
