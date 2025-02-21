@@ -156,4 +156,3 @@ const CompInterCalculator = () => {
 export default CompInterCalculator;
 
 
-// In the result with interest when i add initial investment is 100 and monthly contribution is 20 and duration is 1 and interest rate is 5% then the result is  With Interest: ₹350.45 but the expected result is With Interest: ₹345.00 and Without Interest: ₹340.00 without interest result is correct.
