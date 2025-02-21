@@ -80,7 +80,7 @@ const CompInterCalculator = () => {
 
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Step 2: Contribute
+              Step 2: Monthly Contribute
             </h2>
             <label className="text-sm font-medium text-gray-600">
             Amount that you plan to add to the principal every month.
@@ -136,10 +136,10 @@ const CompInterCalculator = () => {
             </label>
             <input
               type="number"
-              value={estimatedInterestRate}
-              onChange={(e) => setEstimatedInterestRate(e.target.value)}
+              value={varianceRange}
+              onChange={(e) => setVarianceRange(e.target.value)}
               className="mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="5%"
+              placeholder="7%"
             />
              
           </div>
