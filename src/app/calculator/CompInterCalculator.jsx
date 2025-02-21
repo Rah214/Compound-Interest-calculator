@@ -207,10 +207,7 @@ const CompInterCalculator = () => {
                 Maximum Interest Rate: {result.maxResult.interestRate}
               </h3>
               <p className="text-3xl text-green-600 font-semibold mt-2">
-                With Interest: {result.maxResult.futureValueWithInterest}
-              </p>
-              <p className="text-3xl text-gray-600 font-semibold mt-2">
-                Without Interest: {result.maxResult.futureValueWithoutInterest}
+                With Maximum Interest: {result.maxResult.futureValueWithInterest}
               </p>
             </div>
           </div>
