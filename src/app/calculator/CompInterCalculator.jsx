@@ -11,37 +11,38 @@ const CompInterCalculator = () => {
   const [result, setResult] = useState(null);
 
   const calculate = () => {
-    const principal = parseFloat(initialInvestment);
-    const month = parseFloat(monthlyContribution);
-    const interest = parseFloat(estimatedInterestRate) / 100;
-    const time = parseFloat(years);
+    const P = parseFloat(initialInvestment);
+    const c = parseFloat(monthlyContribution);
+    const r = parseFloat(estimatedInterestRate) / 100;
+    const t = parseFloat(years);
     const variance = parseFloat(varianceRange) / 100;
+    const n = 1;
 
-    if (isNaN(principal) || isNaN(month) || isNaN(interest) || isNaN(time) || isNaN(variance)) {
+    if (isNaN(P) || isNaN(c) || isNaN(r) || isNaN(t) || isNaN(variance)) {
       alert("Please fill out all required fields correctly.");
       return;
     }
 
-    const n = 1; // Compounding frequency (Annually)
-    const maxInterest = interest + variance;
+    const maxInterest = r + variance;
 
     const calculateFutureValue = (rate) => {
-      let futureValueWithInterest = principal * Math.pow(1 + rate / n, n * time);
+      const x = Math.pow(1 + rate / n, n * t);
+      const compoundInterest = P * x;
+      const contributionInterest = c * ((x - 1) / (rate / 12));
 
-      for (let i = 1; i <= time * 12; i++) {
-        futureValueWithInterest += month * Math.pow(1 + rate / n, n * time - i / 12);
-      }
+      const futureValueWithInterest = (
+        compoundInterest + contributionInterest
+      ).toFixed(2);
 
-      const futureValueWithoutInterest = principal + month * 12 * time;
-
+      const futureValueWithoutInterest = P + c * 12 * t;
       return {
-        futureValueWithInterest: `₹${futureValueWithInterest.toFixed(2)}`,
+        futureValueWithInterest: `₹${futureValueWithInterest}`,
         futureValueWithoutInterest: `₹${futureValueWithoutInterest.toFixed(2)}`,
         interestRate: `${(rate * 100).toFixed(2)}%`,
       };
     };
 
-    const baseResult = calculateFutureValue(interest);
+    const baseResult = calculateFutureValue(r);
     const maxResult = calculateFutureValue(maxInterest);
 
     setResult({
@@ -184,32 +185,41 @@ const CompInterCalculator = () => {
         </div>
 
         {result && (
-          <div className="mt-8 p-6 bg-green-100 rounded-lg text-center shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800">
+          <div className="mt-8 p-8 bg-white rounded-lg shadow-2xl border border-gray-100">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
               Your Future Value
             </h2>
-            <p className="text-xl text-gray-700 mt-2">
-              In {years} years, your investment will be:
+            <p className="text-xl text-gray-700 mb-8 text-center">
+              In <span className="font-bold">{years}</span> years, your investment will be:
             </p>
-            <div className="mt-4">
-              <h3 className="text-xl font-semibold text-gray-700">
-                Interest Rate: {result.baseResult.interestRate}
-              </h3>
-              <p className="text-3xl text-green-600 font-semibold mt-2">
-                With Interest: {result.baseResult.futureValueWithInterest}
-              </p>
-              <p className="text-3xl text-gray-600 font-semibold mt-2">
-                Without Interest: {result.baseResult.futureValueWithoutInterest}
-              </p>
+
+            <div className="space-y-8">
+              <div className="bg-green-50 p-6 rounded-lg border border-green-100">
+                <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                  Interest Rate: {result.baseResult.interestRate}
+                </h3>
+                <div className="space-y-2">
+                  <p className="text-2xl text-green-600 font-semibold">
+                    With Interest: {result.baseResult.futureValueWithInterest}
+                  </p>
+                  <p className="text-2xl text-gray-600 font-semibold">
+                    Without Interest:{" "}
+                    {result.baseResult.futureValueWithoutInterest}
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                <h3 className="text-xl font-semibold text-gray-700 mb-4">
+                  Maximum Interest Rate: {result.maxResult.interestRate}
+                </h3>
+                <p className="text-2xl text-blue-600 font-semibold">
+                  With Maximum Interest:{" "}
+                  {result.maxResult.futureValueWithInterest}
+                </p>
+              </div>
             </div>
-            <div className="mt-6">
-              <h3 className="text-xl font-semibold text-gray-700">
-                Maximum Interest Rate: {result.maxResult.interestRate}
-              </h3>
-              <p className="text-3xl text-green-600 font-semibold mt-2">
-                With Maximum Interest: {result.maxResult.futureValueWithInterest}
-              </p>
-            </div>
+
           </div>
         )}
       </div>
@@ -218,3 +228,4 @@ const CompInterCalculator = () => {
 };
 
 export default CompInterCalculator;
+
