@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "chart.js/auto";
 
 const CompInterCalculator = () => {
@@ -10,6 +10,13 @@ const CompInterCalculator = () => {
   const [varianceRange, setVarianceRange] = useState("");
   const [compoundFrequency, setCompoundFrequency] = useState("Annually");
   const [result, setResult] = useState(null);
+  const [showResult, setShowResult] = useState(false); 
+
+  useEffect(() => {
+    if (result) {
+      setShowResult(true); 
+    }
+  }, [result]);
 
   const calculate = () => {
     const P = parseFloat(initialInvestment);
@@ -57,15 +64,17 @@ const CompInterCalculator = () => {
   };
 
   const resetForm = () => {
-    setInitialInvestment("");
-    setMonthlyContribution("");
-    setYears("");
-    setEstimatedInterestRate("");
-    setVarianceRange("");
-    setCompoundFrequency("Annually");
-    setResult(null);
+    setShowResult(false);
+    setTimeout(() => {
+      setInitialInvestment("");
+      setMonthlyContribution("");
+      setYears("");
+      setEstimatedInterestRate("");
+      setVarianceRange("");
+      setCompoundFrequency("Annually");
+      setResult(null);
+    }, 300);
   };
-
   return (
     <section className="bg-gray-200 min-h-screen flex items-center justify-center py-12">
       <div className="bg-sky-50 w-full max-w-3xl rounded-lg shadow-lg p-8 space-y-8">
@@ -190,7 +199,11 @@ const CompInterCalculator = () => {
         </div>
 
         {result && (
-          <div className="mt-8 p-8 bg-white rounded-lg shadow-2xl border border-gray-100">
+          <div
+            className={`mt-8 p-8 bg-white rounded-lg shadow-2xl border border-gray-100 transition-opacity duration-300 ${
+              showResult ? "opacity-100" : "opacity-0"
+            }`}
+          >
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
               The Results Are In
             </h2>
@@ -240,4 +253,3 @@ const CompInterCalculator = () => {
 };
 
 export default CompInterCalculator;
-
