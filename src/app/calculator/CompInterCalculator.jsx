@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { Line } from "react-chartjs-2";
 import "chart.js/auto";
 
 const CompInterCalculator = () => {
@@ -10,11 +11,13 @@ const CompInterCalculator = () => {
   const [varianceRange, setVarianceRange] = useState("");
   const [compoundFrequency, setCompoundFrequency] = useState("Annually");
   const [result, setResult] = useState(null);
-  const [showResult, setShowResult] = useState(false); 
+  const [showResult, setShowResult] = useState(false);
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     if (result) {
-      setShowResult(true); 
+      setShowResult(true);
+      generateChartData();
     }
   }, [result]);
 
@@ -63,6 +66,57 @@ const CompInterCalculator = () => {
     });
   };
 
+  const generateChartData = () => {
+    const P = parseFloat(initialInvestment);
+    const c = parseFloat(monthlyContribution);
+    const r = parseFloat(estimatedInterestRate) / 100;
+    const t = parseFloat(years);
+    const variance = parseFloat(varianceRange) / 100;
+    const n = 1;
+
+    const step = 0.5;
+    const labels = Array.from({ length: Math.floor(t / step) + 1 }, (_, i) =>
+      (i * step).toFixed(1)
+    );
+
+    const calculateData = (rate) => {
+      return labels.map((year) => {
+        const x = Math.pow(1 + rate / n, n * year);
+        const compoundInterest = P * x;
+        const contributionInterest = c * 12 * ((x - 1) / (rate / n));
+        return compoundInterest + contributionInterest;
+      });
+    };
+
+    const baseData = calculateData(r);
+    const maxData = calculateData(r + variance);
+    const zeroData = labels.map((year) => P + c * 12 * year);
+
+    setChartData({
+      labels,
+      datasets: [
+        {
+          label: `Base Interest Rate (${(r * 100).toFixed(2)}%)`,
+          data: baseData,
+          borderColor: "rgba(75, 192, 192, 1)",
+          fill: false,
+        },
+        {
+          label: `Max Interest Rate (${((r + variance) * 100).toFixed(2)}%)`,
+          data: maxData,
+          borderColor: "rgba(54, 162, 235, 1)",
+          fill: false,
+        },
+        {
+          label: "Zero Interest Rate (0%)",
+          data: zeroData,
+          borderColor: "rgba(255, 99, 132, 1)",
+          fill: true,
+        },
+      ],
+    });
+  };
+
   const resetForm = () => {
     setShowResult(false);
     setTimeout(() => {
@@ -73,8 +127,10 @@ const CompInterCalculator = () => {
       setVarianceRange("");
       setCompoundFrequency("Annually");
       setResult(null);
-    }, 300);
+      setChartData(null);
+    });
   };
+
   return (
     <section className="bg-gray-200 min-h-screen flex items-center justify-center py-12">
       <div className="bg-sky-50 w-full max-w-3xl rounded-lg shadow-lg p-8 space-y-8">
@@ -109,6 +165,7 @@ const CompInterCalculator = () => {
             <label className="text-sm font-medium text-gray-600">
               Amount that you plan to add to the principal every month.
             </label>
+
             <input
               type="number"
               value={monthlyContribution}
@@ -245,6 +302,56 @@ const CompInterCalculator = () => {
                 </div>
               </div>
             </div>
+
+            {chartData && (
+              <div className="mt-10 w-full h-96 md:h-120 lg:h-144">
+                <Line
+                  data={chartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: "top",
+                      },
+                      title: {
+                        display: true,
+                        text: "Investment Growth Over Time",
+                        font: {
+                          size: window.innerWidth < 768 ? 14 : 18,
+                        },
+                      },
+                    },
+                    scales: {
+                      y: {
+                        title: {
+                          display: true,
+                          color: "Black",
+                          text: "Indian Rupee (₹)",
+                          font: {
+                            size: window.innerWidth < 768 ? 12 : 16,
+                            weight: "bold",
+                          },
+                          padding: { right: 20 },
+                        },
+                      },
+                      x: {
+                        title: {
+                          display: true,
+                          text: "Time (Years)",
+                          color: "Black",
+                          font: {
+                            size: window.innerWidth < 768 ? 12 : 16,
+                            weight: "bold",
+                          },
+                          padding: { top: 20 },
+                        },
+                      },
+                    },
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
